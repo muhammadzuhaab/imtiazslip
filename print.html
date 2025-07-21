@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Receipt</title>
+  <style>
+    body {
+      width: 302px;
+      font-family: monospace;
+      font-size: 12px;
+      margin: 0 auto;
+      background: white;
+      padding: 10px !important;
+      color: #000;
+    }
+
+    #receiptContainer {
+      padding: 20px;
+    }
+
+    h4,
+    h3 {
+      margin: 10px 0;
+    }
+
+    p {
+      margin: 3px 0;
+    }
+
+    .divider {
+      border-top: 1px dashed #000;
+      margin: 8px 0;
+    }
+
+    #downloadBtn {
+      display: block;
+      margin: 10px auto;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    @media print {
+      #downloadBtn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="receiptContainer">
+    <div style="text-align: center;">
+      <img src="download.png" alt="Imtiaz Logo" style="width: 60%; margin-bottom: 5px; filter: grayscale(100%);" />
+    </div>
+
+    <div id="receiptInfo"></div>
+
+    <h4 style="text-align: center; border-top: 1px dashed #000; border-bottom: 1px dashed #000; transform: scaleY(2); transform-origin: top;">
+      Original Receipt</h4>
+
+    <p style="margin-top: 22px !important; transform: scaleY(2); transform-origin: center;">Product Description</p>
+    <table style="width: 100%; text-align: left; margin-top: 8px; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 1px dashed #000;">
+          <th style="transform: scaleY(1.2); transform-origin: top; padding-bottom: 7px;">Quantity</th>
+          <th style="transform: scaleY(1.2); transform-origin: top; padding-bottom: 7px;">Price</th>
+          <th style="transform: scaleY(1.2); transform-origin: top; padding-bottom: 7px;">Discount</th>
+          <th style="transform: scaleY(1.2); transform-origin: top; padding-bottom: 7px;">Total</th>
+        </tr>
+        <tr style="border-bottom: 1px dashed #000; border-top: 1px dashed #000;">
+          <th style="transform: scaleY(1.4); transform-origin: center; padding: 7px; text-align: center;" colspan="4">Sales Items</th>
+        </tr>
+      </thead>
+      <tbody id="productsList">
+
+      </tbody>
+
+    </table>
+
+    <hr class="divider">
+
+    <div id="totalsInfo"></div>
+
+    <hr class="divider">
+
+    <div style="text-align: center; margin: 10px 0;">
+      <img src="image.png" style="height: 40px;" />
+    </div>
+
+    <hr class="divider">
+    <div style="font-size: 11px; margin-top: 10px;">
+      <p>Thank you for shopping at Imtiaz, the leading retail chain of Pakistan...</p>
+      <p>Return within 14 days. No return for Fresh, Frozen, Pharmacy or used items.</p>
+    </div>
+    <hr class="divider">
+
+    <div style="text-align: center; font-size: 11px; margin-top: 10px;">
+      <p style="transform: scaleY(3); transform-origin: center; margin: 10px "><strong>We’d love to hear from you!</strong></p>
+      <p style="transform: scaleY(1.3); transform-origin: center; font-weight: bold;">UAN: 021-111-IMTIAZ(468429)</p>
+      <p style="transform: scaleY(1.3); transform-origin: center; font-weight: bold;">Email: hello@imtiaz.com.pk</p>
+      <p style="transform: scaleY(1.3); transform-origin: center; font-weight: bold;">To learn more about us, please visit:</p>
+      <p style="transform: scaleY(1.3); transform-origin: center; font-weight: bold;">www.imtiaz.com.pk</p>
+    </div>
+  </div>
+
+  <button id="downloadBtn">Download Receipt as Image</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    function getQueryParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    function renderReceipt() {
+      const printId = parseInt(getQueryParam("printid"));
+      const receipts = JSON.parse(localStorage.getItem("receipts")) || [];
+      const receipt = receipts[printId];
+
+      if (!receipt) {
+        document.getElementById("receiptInfo").innerHTML = "<p><strong>Receipt not found.</strong></p>";
+        return;
+      }
+
+      const infoHTML = `
+        <p>FBR Invoice #:</p>
+        <p>SKT - MEGA HARRAR</p>
+        <p>GST #: 17-12-9999-202-37</p>
+        <p>Transaction No: ${receipt.transNo}</p>
+        <p>Transaction Date: ${receipt.transDate}</p>
+        <p>User: ${receipt.user}</p>
+        <p>POS: ${receipt.pos}</p>
+      `;
+      document.getElementById("receiptInfo").innerHTML = infoHTML;
+
+      let totalItems = 0, totalQty = 0, totalDiscount = 0, subtotal = 0;
+
+      const productsHTML = receipt.products.map(p => {
+        totalItems++;
+        totalQty += parseFloat(p.qty);
+        totalDiscount += parseFloat(p.discount);
+        subtotal += parseFloat(p.total);
+        return `
+            <tr><td colspan="4" style="font-weight: bold; transform: scaleY(1.2); transform-origin: top;">${p.name}</td></tr>
+            <tr>
+              <td>${p.qty.toFixed(2)}</td>
+              <td>${p.price.toFixed(2)}</td>
+              <td>${p.discount.toFixed(2)}</td>
+              <td style="text-align: right">Rs${p.total.toFixed(2)}</td>
+          </div>`;
+      }).join("");
+
+      document.getElementById("productsList").innerHTML = productsHTML;
+
+      const tax = subtotal * 0.17;
+      const finalTotal = subtotal + tax;
+
+      document.getElementById("totalsInfo").innerHTML = `
+        <table style="width:100%">
+          <tbody>
+            <tr>
+              <td>Items/Quantity:</td>
+              <td style="text-align: right;">Rs${totalItems} / ${totalQty.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td>Discount:</td>
+              <td style="text-align: right;">Rs${totalDiscount.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td>Sale Tax:</td>
+              <td style="text-align: right;">Rs 0.00</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; padding-left: 10px; transform: scaleY(3); transform-origin: center;">Invoice Value</td>
+              <td style="padding: 8px 0; text-align: right; transform: scaleY(3); transform-origin: center;">Rs${finalTotal.toFixed(2)}</td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+    }
+
+    document.getElementById("downloadBtn").addEventListener("click", function () {
+      html2canvas(document.getElementById("receiptContainer")).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "receipt.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    });
+
+    renderReceipt();
+  </script>
+</body>
+
+</html>

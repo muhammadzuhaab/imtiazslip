@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Modern Invoice System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f9fafb;
+    }
+
+    .card {
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    input:focus, select:focus {
+      border-color: #ced4da !important;
+      box-shadow: none !important;
+    }
+
+    .form-section-title {
+      border-left: 4px solid #0d6efd;
+      padding-left: 10px;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .btn-sm {
+      font-size: 0.85rem;
+      padding: 0.35rem 0.65rem;
+    }
+
+    .table th, .table td {
+      vertical-align: middle;
+    }
+
+    .table input {
+      height: 36px;
+    }
+
+    .table td:last-child {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body class="p-4">
+  <div class="container">
+    <!-- Invoice Form -->
+    <div class="card p-4 mb-4">
+      <h5 class="form-section-title">Create Invoice</h5>
+      <form id="invoiceForm">
+        <div class="row g-3 mb-3">
+          <div class="col-md-3"><input type="text" class="form-control" id="transNo" placeholder="Transaction No" required></div>
+          <div class="col-md-3"><input type="date" class="form-control" id="transDate" required></div>
+          <div class="col-md-3"><input type="text" class="form-control" id="user" placeholder="User" required></div>
+          <div class="col-md-3"><input type="text" class="form-control" id="pos" placeholder="POS" required></div>
+        </div>
+
+        <h6 class="mt-4 mb-2">Products</h6>
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Product Name</th>
+                <th width="10%">Qty</th>
+                <th width="15%">Price</th>
+                <th width="15%">Discount</th>
+                <th width="15%">Total</th>
+                <th width="5%">Action</th>
+              </tr>
+            </thead>
+            <tbody id="productContainer"></tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between mt-3">
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="addProduct">+ Add Product</button>
+          <button type="submit" class="btn btn-primary btn-sm">💾 Save Invoice</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Receipt List -->
+    <div class="card p-4">
+      <h5 class="form-section-title">Receipts</h5>
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+          <thead class="table-primary">
+            <tr>
+              <th>#</th>
+              <th>Transaction No</th>
+              <th>Date</th>
+              <th>User</th>
+              <th>POS</th>
+              <th>Products</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="receiptsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script>
+    let currentEditIndex = null;
+
+    function renderReceipts() {
+      const receipts = JSON.parse(localStorage.getItem('receipts')) || [];
+      const tbody = $('#receiptsTableBody');
+      tbody.empty();
+
+      receipts.forEach((receipt, index) => {
+        tbody.append(`
+          <tr>
+            <td>${index + 1}</td>
+            <td>${receipt.transNo}</td>
+            <td>${receipt.transDate}</td>
+            <td>${receipt.user}</td>
+            <td>${receipt.pos}</td>
+            <td>${receipt.products.length}</td>
+            <td>
+              <button class="btn btn-warning btn-sm edit" data-index="${index}">Edit</button>
+              <button class="btn btn-danger btn-sm delete" data-index="${index}">Delete</button>
+              <a href="print.html?printid=${index}" class="btn btn-primary btn-sm">Print</a>
+            </td>
+          </tr>
+        `);
+      });
+    }
+
+    function resetForm() {
+      $('#invoiceForm')[0].reset();
+      $('#productContainer').empty();
+      addProductRow();
+      currentEditIndex = null;
+    }
+
+    function addProductRow(product = {}) {
+      const row = $(`
+        <tr class="product-row">
+          <td><input type="text" class="form-control pname" placeholder="Product Name" value="${product.name || ''}"></td>
+          <td><input type="number" class="form-control pqty" placeholder="Qty" value="${product.qty || 1}"></td>
+          <td><input type="number" class="form-control pprice" placeholder="Price" value="${product.price || 0}"></td>
+          <td><input type="number" class="form-control pdiscount" placeholder="Discount" value="${product.discount || 0}"></td>
+          <td><input type="number" class="form-control ptotal" placeholder="Total" value="${product.total || 0}" readonly></td>
+          <td><button type="button" class="btn btn-danger btn-sm removeProduct">×</button></td>
+        </tr>
+      `);
+      $('#productContainer').append(row);
+      calculateTotal(row);
+    }
+
+    function calculateTotal(row) {
+      const qty = parseFloat(row.find('.pqty').val()) || 0;
+      const price = parseFloat(row.find('.pprice').val()) || 0;
+      const discount = parseFloat(row.find('.pdiscount').val()) || 0;
+      const total = (qty * price) - discount;
+      row.find('.ptotal').val(total.toFixed(2));
+    }
+
+    $(document).on('input', '.pqty, .pprice, .pdiscount', function () {
+      const row = $(this).closest('.product-row');
+      calculateTotal(row);
+    });
+
+    $(document).on('click', '.removeProduct', function () {
+      $(this).closest('tr').remove();
+    });
+
+    $('#addProduct').on('click', function () {
+      addProductRow();
+    });
+
+    $('#invoiceForm').on('submit', function (e) {
+      e.preventDefault();
+
+      const products = [];
+      $('#productContainer .product-row').each(function () {
+        const row = $(this);
+        calculateTotal(row);
+        products.push({
+          name: row.find('.pname').val(),
+          qty: parseFloat(row.find('.pqty').val()) || 0,
+          price: parseFloat(row.find('.pprice').val()) || 0,
+          discount: parseFloat(row.find('.pdiscount').val()) || 0,
+          total: parseFloat(row.find('.ptotal').val()) || 0
+        });
+      });
+
+      const receipt = {
+        transNo: $('#transNo').val(),
+        transDate: $('#transDate').val(),
+        user: $('#user').val(),
+        pos: $('#pos').val(),
+        products
+      };
+
+      let receipts = JSON.parse(localStorage.getItem('receipts')) || [];
+
+      if (currentEditIndex !== null) {
+        receipts[currentEditIndex] = receipt;
+      } else {
+        receipts.push(receipt);
+      }
+
+      localStorage.setItem('receipts', JSON.stringify(receipts));
+      renderReceipts();
+      resetForm();
+    });
+
+    $(document).on('click', '.delete', function () {
+      const index = $(this).data('index');
+      if (confirm('Are you sure you want to delete this invoice?')) {
+        let receipts = JSON.parse(localStorage.getItem('receipts')) || [];
+        receipts.splice(index, 1);
+        localStorage.setItem('receipts', JSON.stringify(receipts));
+        renderReceipts();
+      }
+    });
+
+    $(document).on('click', '.edit', function () {
+      const index = $(this).data('index');
+      const receipts = JSON.parse(localStorage.getItem('receipts')) || [];
+      const receipt = receipts[index];
+
+      $('#transNo').val(receipt.transNo);
+      $('#transDate').val(receipt.transDate);
+      $('#user').val(receipt.user);
+      $('#pos').val(receipt.pos);
+      $('#productContainer').empty();
+      receipt.products.forEach(p => addProductRow(p));
+
+      currentEditIndex = index;
+    });
+
+    $(document).ready(function () {
+      renderReceipts();
+      addProductRow(); // Initial row
+    });
+  </script>
+</body>
+</html>
