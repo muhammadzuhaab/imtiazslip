@@ -46,6 +46,12 @@
         display: none;
       }
     }
+
+    .wrap-text {
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+    }
   </style>
 </head>
 
@@ -57,20 +63,22 @@
 
     <div id="receiptInfo"></div>
 
-    <h4 style="text-align: center; border-top: 1px dashed #000; border-bottom: 1px dashed #000; transform: scaleY(2); transform-origin: top;">
+    <h4
+      style="text-align: center; border-top: 1px dashed #000; border-bottom: 1px dashed #000; transform: scaleY(2.5); transform-origin: center; margin-top: 20px; font-weight: 600;">
       Original Receipt</h4>
 
-    <p style="margin-top: 22px !important; transform: scaleY(2); transform-origin: center;">Product Description</p>
+    <p style="margin-top: 22px !important; transform: scaleY(2.1); transform-origin: center;">Product Description</p>
     <table style="width: 100%; text-align: left; margin-top: 8px; border-collapse: collapse;">
       <thead>
         <tr style="border-bottom: 1px dashed #000;">
-          <th style="transform: scaleY(1.2); transform-origin: top; padding-bottom: 7px;">Quantity</th>
-          <th style="transform: scaleY(1.2); transform-origin: top; padding-bottom: 7px;">Price</th>
-          <th style="transform: scaleY(1.2); transform-origin: top; padding-bottom: 7px;">Discount</th>
-          <th style="transform: scaleY(1.2); transform-origin: top; padding-bottom: 7px;">Total</th>
+          <th style="transform: scaleY(1.4); transform-origin: top; padding-bottom: 7px;">Quantity</th>
+          <th style="transform: scaleY(1.4); transform-origin: top; padding-bottom: 7px; text-align: center;">Price</th>
+          <th style="transform: scaleY(1.4); transform-origin: top; padding-bottom: 7px; text-align: center;">Discount</th>
+          <th style="transform: scaleY(1.4); transform-origin: top; padding-bottom: 7px; text-align: end;">Total</th>
         </tr>
         <tr style="border-bottom: 1px dashed #000; border-top: 1px dashed #000;">
-          <th style="transform: scaleY(1.4); transform-origin: center; padding: 7px; text-align: center;" colspan="4">Sales Items</th>
+          <th style="transform: scaleY(1.4); transform-origin: center; padding: 7px; text-align: center;" colspan="4">
+            Sales Items</th>
         </tr>
       </thead>
       <tbody id="productsList">
@@ -79,29 +87,63 @@
 
     </table>
 
-    <hr class="divider">
+    <hr class="divider" style="margin: 2px;">
 
     <div id="totalsInfo"></div>
 
-    <hr class="divider">
+    <table style="width: 100%; text-align: left; margin-top: 8px; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 1px dashed #000; border-top: 1px dashed #000;">
+          <th style="transform: scaleY(1.4); transform-origin: center; padding: 7px; text-align: center;" colspan="4">
+            Sale Tax Breakup</th>
+        </tr>
+        <tr>
+          <th style="transform: scaleY(1.2); transform-origin: top; padding-bottom: 7px;"></th>
+          <th style="transform: scaleY(1.2); transform-origin: top; padding-bottom: 7px; text-align: center;">Exl. Amt
+          </th>
+          <th style="transform: scaleY(1.2); transform-origin: top; padding-bottom: 7px; text-align: center;">GST</th>
+          <th style="transform: scaleY(1.2); transform-origin: top; padding-bottom: 7px; text-align: end;">Inl. Amt</th>
+        </tr>
+      </thead>
+      <tbody id="taxList"></tbody>
+    </table>
 
-    <div style="text-align: center; margin: 10px 0;">
-      <img src="image.png" style="height: 40px;" />
+    <table style="width: 100%; text-align: left; margin-top: 8px; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 1px dashed #000; border-top: 1px dashed #000;">
+          <th style="transform: scaleY(1.4); transform-origin: center; padding: 7px; text-align: center;" colspan="4">
+            Payments</th>
+        </tr>
+      </thead>
+      <tbody id="payments"></tbody>
+    </table>
+
+    <hr class="divider" style="margin: 2px;">
+    <div style="text-align: center;">
+      <img src="image.png" style="height: 35px; width: 80%" />
+      <p id="trnumber"
+        style="letter-spacing: 7px; margin-top: -4px; margin-bottom: 30px; transform: scaleY(1.3); transform-origin: center;">
+      </p>
     </div>
 
     <hr class="divider">
-    <div style="font-size: 11px; margin-top: 10px;">
-      <p>Thank you for shopping at Imtiaz, the leading retail chain of Pakistan...</p>
-      <p>Return within 14 days. No return for Fresh, Frozen, Pharmacy or used items.</p>
+    <div style="font-size: 11px; margin: 20px 0; ">
+      <p style="transform: scaleY(1.3); transform-origin: center;" class="wrap-text">Thank you for shopping at Imtiaz,
+        the leading retail
+        chain of Pakistan. Please keep this receipt safe for the purpose of Return and Exchage which is only allowed
+        within first 14 days of shopping. Freezan, Frozen, Pharmacy, open and used items will not be accepted for return
+        and exchange.</p>
     </div>
     <hr class="divider">
 
     <div style="text-align: center; font-size: 11px; margin-top: 10px;">
-      <p style="transform: scaleY(3); transform-origin: center; margin: 10px "><strong>We’d love to hear from you!</strong></p>
-      <p style="transform: scaleY(1.3); transform-origin: center; font-weight: bold;">UAN: 021-111-IMTIAZ(468429)</p>
-      <p style="transform: scaleY(1.3); transform-origin: center; font-weight: bold;">Email: hello@imtiaz.com.pk</p>
-      <p style="transform: scaleY(1.3); transform-origin: center; font-weight: bold;">To learn more about us, please visit:</p>
-      <p style="transform: scaleY(1.3); transform-origin: center; font-weight: bold;">www.imtiaz.com.pk</p>
+      <p style="transform: scaleY(3); transform-origin: center; margin: 10px "><strong>We'd love to hear from
+          you!</strong></p>
+      <p style="transform: scaleY(1.4); transform-origin: center; font-weight: bold;">UAN: 021-111-IMTIAZ(468429)</p>
+      <p style="transform: scaleY(1.4); transform-origin: center; font-weight: bold;">Email: hello@imtiaz.com.pk</p>
+      <p style="transform: scaleY(1.4); transform-origin: center; font-weight: bold;">To learn more about us, please
+        visit:</p>
+      <p style="transform: scaleY(1.4); transform-origin: center; font-weight: bold;">www.imtiaz.com.pk</p>
     </div>
   </div>
 
@@ -124,14 +166,16 @@
         return;
       }
 
+      document.getElementById("trnumber").innerText = receipt.transNo;
+
       const infoHTML = `
-        <p>FBR Invoice #:</p>
-        <p>SKT - MEGA HARRAR</p>
-        <p>GST #: 17-12-9999-202-37</p>
-        <p>Transaction No: ${receipt.transNo}</p>
-        <p>Transaction Date: ${receipt.transDate}</p>
-        <p>User: ${receipt.user}</p>
-        <p>POS: ${receipt.pos}</p>
+        <p style="transform: scaleY(1.2); transform-origin: center;">FBR Invoice #:</p>
+        <p style="transform: scaleY(1.2); transform-origin: center;">SKT - MEGA HARRAR</p>
+        <p style="transform: scaleY(1.2); transform-origin: center;">GST #: 17-12-9999-202-37</p>
+        <p style="transform: scaleY(1.2); transform-origin: center;">Transaction No: ${receipt.transNo}</p>
+        <p style="transform: scaleY(1.2); transform-origin: center;">Transaction Date: ${receipt.transDate}</p>
+        <p style="transform: scaleY(1.2); transform-origin: center;">User: ${receipt.user}</p>
+        <p style="transform: scaleY(1.2); transform-origin: center;">POS: ${receipt.pos}</p>
       `;
       document.getElementById("receiptInfo").innerHTML = infoHTML;
 
@@ -143,34 +187,64 @@
         totalDiscount += parseFloat(p.discount);
         subtotal += parseFloat(p.total);
         return `
-            <tr><td colspan="4" style="font-weight: bold; transform: scaleY(1.2); transform-origin: top;">${p.name}</td></tr>
+            <tr><td colspan="4" style="font-weight: bold; transform: scaleY(1.2); transform-origin: top; word-spacing: -3px">${p.name}</td></tr>
             <tr>
               <td>${p.qty.toFixed(2)}</td>
               <td>${p.price.toFixed(2)}</td>
               <td>${p.discount.toFixed(2)}</td>
               <td style="text-align: right">Rs${p.total.toFixed(2)}</td>
-          </div>`;
+          </tr>`;
       }).join("");
-
       document.getElementById("productsList").innerHTML = productsHTML;
 
-      const tax = subtotal * 0.17;
-      const finalTotal = subtotal + tax;
+      const taxHTML = receipt.taxes.map(p => {
+        return `
+            <tr>
+              <td>${p.title}</td>
+              <td>Rs${p.exl.toFixed(2)}</td>
+              <td>Rs${p.gst.toFixed(2)}</td>
+              <td style="text-align: right">Rs${p.inl.toFixed(2)}</td>
+          </tr>`;
+      }).join("");
+      document.getElementById("taxList").innerHTML = taxHTML;
+
+      const paymentsHTML = `
+            <tr>
+              <td style="width: 100%">CASH</td>
+              <td>Rs${receipt.cashReceived.toFixed(2)}</td>
+          </tr>
+           <tr>
+              <td>Change Due</td>
+              <td>Rs${receipt.cashReturn.toFixed(2)}</td>
+          </tr>
+          `;
+      document.getElementById("payments").innerHTML = paymentsHTML;
+
+      let totalTax = 0;
+
+      receipt.taxes.forEach(tax => {
+        totalTax += parseInt(tax.gst) ?? 0;
+      });
+      const finalTotal = subtotal;
 
       document.getElementById("totalsInfo").innerHTML = `
         <table style="width:100%">
           <tbody>
             <tr>
-              <td>Items/Quantity:</td>
-              <td style="text-align: right;">Rs${totalItems} / ${totalQty.toFixed(2)}</td>
+              <td style="transform: scaleY(1.2); transform-origin: center;">Total Items/Quantity:</td>
+              <td style="text-align: right; transform: scaleY(1.2); transform-origin: center;">Rs${totalItems} / ${totalQty.toFixed(2)}</td>
             </tr>
             <tr>
-              <td>Discount:</td>
-              <td style="text-align: right;">Rs${totalDiscount.toFixed(2)}</td>
+              <td style="transform: scaleY(1.2); transform-origin: center;">Discount:</td>
+              <td style="text-align: right; transform: scaleY(1.2); transform-origin: center;">Rs${totalDiscount.toFixed(2)}</td>
             </tr>
             <tr>
-              <td>Sale Tax:</td>
-              <td style="text-align: right;">Rs 0.00</td>
+              <td style="transform: scaleY(1.2); transform-origin: center;">Sale Tax:</td>
+              <td style="text-align: right; transform: scaleY(1.2); transform-origin: center;">Rs${totalTax.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td style="transform: scaleY(1.2); transform-origin: center;">Rounding:</td>
+              <td style="text-align: right; transform: scaleY(1.2); transform-origin: center;">Rs0.00</td>
             </tr>
             <tr>
               <td style="padding: 8px 0; padding-left: 10px; transform: scaleY(3); transform-origin: center;">Invoice Value</td>

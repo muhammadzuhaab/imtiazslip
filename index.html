@@ -38,6 +38,7 @@
 
     .table input {
       height: 36px;
+      min-width: 150px;
     }
 
     .table td:last-child {
@@ -54,7 +55,7 @@
       <form id="invoiceForm">
         <div class="row g-3 mb-3">
           <div class="col-md-3"><input type="text" class="form-control" id="transNo" placeholder="Transaction No" required></div>
-          <div class="col-md-3"><input type="date" class="form-control" id="transDate" required></div>
+          <div class="col-md-3"><input type="text" class="form-control" id="transDate" required placeholder="Date"></div>
           <div class="col-md-3"><input type="text" class="form-control" id="user" placeholder="User" required></div>
           <div class="col-md-3"><input type="text" class="form-control" id="pos" placeholder="POS" required></div>
         </div>
@@ -74,10 +75,36 @@
             </thead>
             <tbody id="productContainer"></tbody>
           </table>
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="addProduct">+ Add Product</button>
+        </div>
+
+        <h6 class="mt-4 mb-2">Tax Details</h6>
+        <div class="table-responsive mb-3">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Title</th>
+                <th>Exl Amount</th>
+                <th>GST</th>
+                <th>Inl. Amount</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="taxContainer"></tbody>
+          </table>
+          <button type="button" class="btn btn-outline-secondary btn-sm mb-3" id="addTax">+ Add Tax</button>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <input type="number" class="form-control" id="cashReceived" placeholder="Cash Received">
+          </div>
+          <div class="col-md-6">
+            <input type="number" class="form-control" id="cashReturn" placeholder="Cash Return">
+          </div>
         </div>
 
         <div class="d-flex justify-content-between mt-3">
-          <button type="button" class="btn btn-outline-secondary btn-sm" id="addProduct">+ Add Product</button>
           <button type="submit" class="btn btn-primary btn-sm">💾 Save Invoice</button>
         </div>
       </form>
@@ -93,8 +120,6 @@
               <th>#</th>
               <th>Transaction No</th>
               <th>Date</th>
-              <th>User</th>
-              <th>POS</th>
               <th>Products</th>
               <th>Actions</th>
             </tr>
@@ -121,8 +146,6 @@
             <td>${index + 1}</td>
             <td>${receipt.transNo}</td>
             <td>${receipt.transDate}</td>
-            <td>${receipt.user}</td>
-            <td>${receipt.pos}</td>
             <td>${receipt.products.length}</td>
             <td>
               <button class="btn btn-warning btn-sm edit" data-index="${index}">Edit</button>
@@ -137,7 +160,9 @@
     function resetForm() {
       $('#invoiceForm')[0].reset();
       $('#productContainer').empty();
+      $('#taxContainer').empty();
       addProductRow();
+      addTaxRow();
       currentEditIndex = null;
     }
 
@@ -154,6 +179,19 @@
       `);
       $('#productContainer').append(row);
       calculateTotal(row);
+    }
+
+    function addTaxRow(tax = {}) {
+      const row = $(`
+        <tr class="tax-row">
+          <td><input type="text" class="form-control taxTitle" placeholder="Title" value="${tax.title || ''}"></td>
+          <td><input type="number" class="form-control exlAmount" placeholder="Exl Amount" value="${tax.exl || ''}"></td>
+          <td><input type="number" class="form-control gstAmount" placeholder="GST" value="${tax.gst || ''}"></td>
+          <td><input type="number" class="form-control inlAmount" placeholder="Inl. Amount" value="${tax.inl || ''}"></td>
+          <td><button type="button" class="btn btn-danger btn-sm removeTax">×</button></td>
+        </tr>
+      `);
+      $('#taxContainer').append(row);
     }
 
     function calculateTotal(row) {
@@ -173,8 +211,16 @@
       $(this).closest('tr').remove();
     });
 
+    $(document).on('click', '.removeTax', function () {
+      $(this).closest('tr').remove();
+    });
+
     $('#addProduct').on('click', function () {
       addProductRow();
+    });
+
+    $('#addTax').on('click', function () {
+      addTaxRow();
     });
 
     $('#invoiceForm').on('submit', function (e) {
@@ -193,12 +239,25 @@
         });
       });
 
+      const taxes = [];
+      $('#taxContainer .tax-row').each(function () {
+        taxes.push({
+          title: $(this).find('.taxTitle').val() || "",
+          exl: parseFloat($(this).find('.exlAmount').val()) || 0,
+          gst: parseFloat($(this).find('.gstAmount').val()) || 0,
+          inl: parseFloat($(this).find('.inlAmount').val()) || 0
+        });
+      });
+
       const receipt = {
         transNo: $('#transNo').val(),
         transDate: $('#transDate').val(),
         user: $('#user').val(),
         pos: $('#pos').val(),
-        products
+        cashReceived: parseFloat($('#cashReceived').val()) || 0,
+        cashReturn: parseFloat($('#cashReturn').val()) || 0,
+        products,
+        taxes
       };
 
       let receipts = JSON.parse(localStorage.getItem('receipts')) || [];
@@ -233,8 +292,14 @@
       $('#transDate').val(receipt.transDate);
       $('#user').val(receipt.user);
       $('#pos').val(receipt.pos);
+      $('#cashReceived').val(receipt.cashReceived);
+      $('#cashReturn').val(receipt.cashReturn);
+
       $('#productContainer').empty();
       receipt.products.forEach(p => addProductRow(p));
+
+      $('#taxContainer').empty();
+      (receipt.taxes || []).forEach(t => addTaxRow(t));
 
       currentEditIndex = index;
     });
@@ -242,6 +307,7 @@
     $(document).ready(function () {
       renderReceipts();
       addProductRow(); // Initial row
+      addTaxRow();     // Initial tax row
     });
   </script>
 </body>
